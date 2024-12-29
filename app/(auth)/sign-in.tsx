@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Dimensions } from "react-native";
+import { View, Text, ScrollView, Image } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -61,7 +61,7 @@ const SignIn = () => {
               href="/sign-up"
               className="text-lg font-psemibold text-secondary"
             >
-              Sign Up
+              Sign up
             </Link>
           </View>
         </View>
