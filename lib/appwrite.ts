@@ -13,7 +13,7 @@ export const config = {
   projectId: process.env.EXPO_PUBLIC_APPWRITE_PROJECT_ID,
   databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
   userCollectionId: process.env.EXPO_PUBLIC_APPWRITE_USER_COLLECTION_ID,
-  videoCollectionid: process.env.EXPO_PUBLIC_APPWRITE_VIDEO_COLLECTION_ID,
+  videoCollectionId: process.env.EXPO_PUBLIC_APPWRITE_VIDEO_COLLECTION_ID,
   storageId: process.env.EXPO_PUBLIC_APPWRITE_STORAGE_ID,
 };
 
@@ -102,3 +102,36 @@ export const getCurrentUser = async () => {
     console.log(e);
   }
 };
+
+// Get all Video Posts
+export async function getAllPosts() {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseId!,
+      config.videoCollectionId!
+    );
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch all videos"
+    );
+  }
+}
+
+// Get latest created video posts
+export async function getLatestPosts() {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseId!,
+      config.videoCollectionId!,
+      [Query.orderDesc("$createdAt"), Query.limit(7)]
+    );
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch latest videos"
+    );
+  }
+}
