@@ -174,7 +174,7 @@ export const getUserPosts = async (userId: string) => {
     const posts = await databases.listDocuments(
       config.databaseId!,
       config.videoCollectionId!,
-      [Query.equal("creator", userId)]
+      [Query.equal("creator", userId), Query.orderDesc("$createdAt")]
     );
 
     return posts.documents;
@@ -224,7 +224,7 @@ export const getFilePreview = async (
 
 // Upload File
 export const uploadFile = async (
-  file: { name: string; mimeType: string; size: number; uri: string }, // Explicit typing of 'file'
+  file: { name: string; mimeType: string; size: number; uri: string },
   type: "video" | "image"
 ): Promise<string | undefined> => {
   if (!file) return;
@@ -261,7 +261,6 @@ export const createVideo = async (form: {
   prompt: string;
   userId: string;
 }): Promise<any> => {
-  // 'any' is used here, consider defining a specific type for the result
   try {
     const [thumbnailUrl, videoUrl] = await Promise.all([
       uploadFile(form.thumbnail, "image"),

@@ -17,7 +17,6 @@ import { router } from "expo-router";
 import { createVideo } from "@/lib/appwrite";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
-// Defining the type for the form state
 interface FormState {
   title: string;
   video: ImagePicker.ImagePickerAsset | null;
@@ -29,7 +28,6 @@ const Create = () => {
   const [uploading, setUploading] = useState(false);
   const { user } = useGlobalContext();
 
-  // Use the defined type for form state
   const [form, setForm] = useState<FormState>({
     title: "",
     video: null,
@@ -37,7 +35,6 @@ const Create = () => {
     prompt: "",
   });
 
-  // Open image or video picker based on selectType
   const openPicker = async (selectType: "image" | "video") => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes:
