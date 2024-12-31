@@ -83,6 +83,19 @@ export const signIn = async (email: string, password: string) => {
   }
 };
 
+// Sign Out
+export async function signOut() {
+  try {
+    const session = await account.deleteSession("current");
+
+    return session;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to sign out."
+    );
+  }
+}
+
 export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get();
@@ -142,6 +155,22 @@ export const searchPosts = async (query: string) => {
       config.databaseId!,
       config.videoCollectionId!,
       [Query.search("title", query)]
+    );
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch latest videos"
+    );
+  }
+};
+
+export const getUserPosts = async (userId: string) => {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseId!,
+      config.videoCollectionId!,
+      [Query.equal("creator", userId)]
     );
 
     return posts.documents;
