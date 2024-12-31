@@ -104,7 +104,7 @@ export const getCurrentUser = async () => {
 };
 
 // Get all Video Posts
-export async function getAllPosts() {
+export const getAllPosts = async () => {
   try {
     const posts = await databases.listDocuments(
       config.databaseId!,
@@ -117,10 +117,10 @@ export async function getAllPosts() {
       error instanceof Error ? error.message : "Failed to fetch all videos"
     );
   }
-}
+};
 
 // Get latest created video posts
-export async function getLatestPosts() {
+export const getLatestPosts = async () => {
   try {
     const posts = await databases.listDocuments(
       config.databaseId!,
@@ -134,4 +134,20 @@ export async function getLatestPosts() {
       error instanceof Error ? error.message : "Failed to fetch latest videos"
     );
   }
-}
+};
+
+export const searchPosts = async (query: string) => {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseId!,
+      config.videoCollectionId!,
+      [Query.search("title", query)]
+    );
+
+    return posts.documents;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch latest videos"
+    );
+  }
+};

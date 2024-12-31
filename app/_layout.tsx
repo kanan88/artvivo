@@ -1,5 +1,5 @@
 import { SplashScreen, Stack } from "expo-router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import "../global.css";
 import { useFonts } from "expo-font";
 import GlobalProvider from "@/context/GlobalProvider";
@@ -37,7 +37,7 @@ const RootLayout = () => {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="/search/[query]" options={{ headerShown: false }} /> */}
+        <Stack.Screen name="search/[query]" options={{ headerShown: false }} />
       </Stack>
     </GlobalProvider>
   );
