@@ -4,7 +4,9 @@ import {
   Client,
   Databases,
   ID,
+  ImageGravity,
   Query,
+  Storage,
 } from "react-native-appwrite";
 
 export const config = {
@@ -27,6 +29,7 @@ client
 const account = new Account(client);
 const avatars = new Avatars(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
 
 export const createUser = async (
   email: string,
@@ -121,7 +124,8 @@ export const getAllPosts = async () => {
   try {
     const posts = await databases.listDocuments(
       config.databaseId!,
-      config.videoCollectionId!
+      config.videoCollectionId!,
+      [Query.orderDesc("$createdAt")]
     );
 
     return posts.documents;
@@ -177,6 +181,110 @@ export const getUserPosts = async (userId: string) => {
   } catch (error) {
     throw new Error(
       error instanceof Error ? error.message : "Failed to fetch latest videos"
+    );
+  }
+};
+
+// Get File Preview
+export const getFilePreview = async (
+  fileId: string,
+  type: "video" | "image"
+): Promise<string> => {
+  let fileUrl: string;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(config.storageId!, fileId).toString();
+    } else if (type === "image") {
+      fileUrl = storage
+        .getFilePreview(
+          config.storageId!,
+          fileId,
+          2000,
+          2000,
+          ImageGravity.Top,
+          100
+        )
+        .toString();
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) {
+      throw new Error("File URL is empty");
+    }
+
+    return fileUrl;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Error during file preview"
+    );
+  }
+};
+
+// Upload File
+export const uploadFile = async (
+  file: { name: string; mimeType: string; size: number; uri: string }, // Explicit typing of 'file'
+  type: "video" | "image"
+): Promise<string | undefined> => {
+  if (!file) return;
+
+  const { mimeType, ...rest } = file;
+  const asset = {
+    name: file.name,
+    type: mimeType,
+    size: file.size,
+    uri: file.uri,
+  };
+
+  try {
+    const uploadedFile = await storage.createFile(
+      config.storageId!,
+      ID.unique(),
+      asset
+    );
+
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Error during file upload"
+    );
+  }
+};
+
+// Create Video
+export const createVideo = async (form: {
+  thumbnail: any;
+  video: any;
+  title: string;
+  prompt: string;
+  userId: string;
+}): Promise<any> => {
+  // 'any' is used here, consider defining a specific type for the result
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail, "image"),
+      uploadFile(form.video, "video"),
+    ]);
+
+    const newPost = await databases.createDocument(
+      config.databaseId!,
+      config.videoCollectionId!,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        prompt: form.prompt,
+        creator: form.userId,
+      }
+    );
+
+    return newPost;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error ? error.message : "Error during video creation"
     );
   }
 };
